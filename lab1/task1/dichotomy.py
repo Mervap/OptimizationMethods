@@ -2,6 +2,7 @@ from lab1.task1.opt import Opt
 
 
 class Dichotomy(Opt):
+    name = "Dichotomy"
 
     def _step(self, x1, x2):
         m = (x1 + x2) / 2

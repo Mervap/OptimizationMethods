@@ -2,6 +2,8 @@ from lab1.task1.reused_opt import ReusedOpt
 
 
 class Fibonacci(ReusedOpt):
+    name = "Fibonacci"
+
     def __init__(self, f, eps, bounds):
         super().__init__(f, eps, bounds)
         self.n = -1
