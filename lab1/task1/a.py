@@ -1,4 +1,5 @@
 from lab1.task1.dichotomy import Dichotomy
+from lab1.task1.fibonacci import Fibonacci
 from lab1.task1.golden_ratio import GoldenRatio
 from lab1.task1.watcher import Watcher
 
@@ -9,6 +10,11 @@ print(f'x = {min_v}\ny = {f(min_v)}\n')
 print(f.invocations)
 
 opt = GoldenRatio(f, 1e-5, [-10, 10])
+min_v = opt.opt()
+print(f'x = {min_v}\ny = {f(min_v)}\n')
+print(f.invocations)
+
+opt = Fibonacci(f, 1e-5, [-10, 10])
 min_v = opt.opt()
 print(f'x = {min_v}\ny = {f(min_v)}\n')
 print(f.invocations)
