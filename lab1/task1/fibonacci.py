@@ -22,9 +22,9 @@ class Fibonacci(ReusedOpt):
         nx1 = self.__next_x(x1, pop=False)
         return nx1, nx2
 
-    def opt(self):
+    def _opt_inner(self):
         self.__fib_precalc()
-        return super().opt()
+        return super()._opt_inner()
 
     def __fib_precalc(self):
         self.fib = [1, 1, 2]

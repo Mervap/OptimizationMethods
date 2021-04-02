@@ -1,6 +1,8 @@
 from abc import abstractmethod
 import pandas as pd
 
+from lab1.watcher import Watcher
+
 
 class Opt:
     def __init__(self, f, eps, bounds):
@@ -15,13 +17,10 @@ class Opt:
     def _step(self, x1, x2):
         pass
 
-    def opt(self):
+    def _opt_inner(self):
         left = self.left
         right = self.right
-
         self._log.append([left, right])
-        self.f.reset()
-        self.f.start_count()
         while right - left > self.eps:
             x1, x2 = self._step(left, right)
             if self.f(x1) < self.f(x2):
@@ -30,8 +29,17 @@ class Opt:
                 left = x1
             self._log.append([left, right])
 
-        self.f.stop_count()
         return (left + right) / 2
+
+    def opt(self):
+        is_watcher = isinstance(self.f, Watcher)
+        if is_watcher:
+            self.f.reset()
+            self.f.start_count()
+        res = self._opt_inner()
+        if is_watcher:
+            self.f.stop_count()
+        return res
 
     def log_frame(self):
         return pd.DataFrame([[i] + self._log[i] for i in range(len(self._log))],

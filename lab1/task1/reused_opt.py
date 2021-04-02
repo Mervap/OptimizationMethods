@@ -8,12 +8,9 @@ class ReusedOpt(Opt, ABC):
         super().__init__(f, eps, bounds)
         self._log_headers = self._log_headers + ['x1', 'x2']
 
-    def opt(self):
+    def _opt_inner(self):
         left = self.left
         right = self.right
-
-        self.f.reset()
-        self.f.start_count()
 
         x1, x2 = self._step(left, right)
         self._log.append([left, right, x1, x2])
@@ -37,5 +34,4 @@ class ReusedOpt(Opt, ABC):
 
             self._log.append([left, right, x1, x2])
 
-        self.f.stop_count()
         return (left + right) / 2
