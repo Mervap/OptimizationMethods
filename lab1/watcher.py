@@ -1,3 +1,6 @@
+from collections import Iterable
+
+
 class Watcher:
     def __init__(self, f, grad=None):
         self.__f = f
@@ -16,7 +19,10 @@ class Watcher:
             raise RuntimeError("No info about gradient")
         if self.__is_count:
             self.grad_invocations = self.grad_invocations + 1
-        return self._grad(*xs)
+        if isinstance(xs, Iterable):
+            return self._grad(*xs)
+        else:
+            return self._grad(xs)
 
     def stop_count(self):
         self.__is_count = False

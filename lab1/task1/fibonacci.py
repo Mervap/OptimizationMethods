@@ -8,6 +8,7 @@ class Fibonacci(ReusedOpt):
         super().__init__(f, eps, bounds)
         self.n = -1
         self.fib = []
+        self.__fib_cache = None
         self.fib_n = -1
 
     def __next_x(self, x, pop=True):
@@ -27,9 +28,14 @@ class Fibonacci(ReusedOpt):
         return super()._opt_inner()
 
     def __fib_precalc(self):
+        if self.__fib_cache is not None:
+            self.fib, self.fib_n = self.__fib_cache
+            return
+
         self.fib = [1, 1, 2]
         bound = (self.right - self.left) / self.eps
         while bound >= self.fib[-1]:
             self.fib.append(self.fib[-1] + self.fib[-2])
         self.n = len(self.fib) - 2
         self.fib_n = self.fib.pop(-1) / (self.right - self.left)
+        self.__fib_cache = (self.fib, self.fib_n)
