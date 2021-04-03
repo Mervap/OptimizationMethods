@@ -33,7 +33,7 @@ class Fibonacci(ReusedOpt):
             return
 
         self.fib = [1, 1, 2]
-        bound = (self.right - self.left) / self.eps
+        bound = (self.right - self.left) / self.eps * 2
         while bound >= self.fib[-1]:
             self.fib.append(self.fib[-1] + self.fib[-2])
         self.n = len(self.fib) - 2
