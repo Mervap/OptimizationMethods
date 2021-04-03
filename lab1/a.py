@@ -9,6 +9,30 @@ from lab1.task2.fastest_gradient_descent import FastestGradientDescent
 from lab1.watcher import Watcher
 import matplotlib.pyplot as plt
 
+def gen_Q(k, n):
+    k = math.sqrt(k)
+    Q = np.abs(np.random.randn(n, n))
+    u, s, v = np.linalg.svd(Q)
+    mn, mx = np.min(s), np.max(s)
+    diff = mx - mn
+
+    def f(x):
+        return (((x - mn) / diff) * (k - 1)) + 1
+
+    Q_res = u @ np.diag(f(s)) @ v.T
+    Q_res = Q_res @ Q_res.T
+
+    # print(np.linalg.cond(Q_res, 'fro'))
+    # print(np.linalg.det(Q_res))
+    w, _ = np.linalg.eig(Q_res)
+    print(w)
+    print(max(w)/min(w))
+
+    return Q_res
+
+gen_Q(5, 3)
+
+
 def markers(min_v: float, max_v: float):
     diff = (max_v - min_v) / 7
     return [min_v + diff * (i + 1) * (1.15 ** i) for i in range(7)]
