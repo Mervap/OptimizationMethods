@@ -1,0 +1,42 @@
+name: Report for lab 2
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'lab2/**'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Build pdf from report.ipynb
+        id: build
+        uses: Mervap/IpynbToPDFAction@v1.0.1
+        with:
+          ipynb-path: 'lab2/report.ipynb'
+          pdf-name: 'report2'
+          template-path: 'russian_template.tex.j2'
+      - name: Move report
+        run: |
+          rm out/report2.pdf
+          mv lab2/report2.pdf out/report2.pdf
+      - name: Commit report
+        run: |
+          git config --local user.email "valeratep@mail.ru"
+          git config --local user.name "Report update bot"
+          git commit -m "Update report" -a
+      - name: Push new report
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          directory: out
