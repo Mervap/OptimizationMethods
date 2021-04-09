@@ -3,6 +3,7 @@ from lab1.watcher import Watcher
 
 
 class FastestGradientDescent(UndimOpt):
+    name = "Gradient descent"
 
     def _desire_step(self, cur, grad):
         def gr(x):
