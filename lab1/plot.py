@@ -8,7 +8,9 @@ def markers(min_v: float, max_v: float):
     return [min_v + diff * (i + 1) * (1.15 ** i) for i in range(7)]
 
 
-def plot_graph(ind, fig, opts, sts, mns, title, per, x_expand, y_expand):
+def plot_graph(ind, fig, opts, sts, mns, title, per, x_expand, y_expand, plt_size=(6, 2), labels=None):
+    if labels is None:
+        labels = sts
     f = opts[0].f
     logs = list(map(lambda x: x.log_frame(), opts))
     logs = list(map(lambda x: x.iloc[-max(3, int(len(x) * per / 100)):], logs))
@@ -20,7 +22,7 @@ def plot_graph(ind, fig, opts, sts, mns, title, per, x_expand, y_expand):
     y_max = max(list(map(lambda x: max(x['y']), logs)))
     y_diff = y_max - y_min
 
-    ax = fig.add_subplot(6, 2, ind)
+    ax = fig.add_subplot(plt_size[0], plt_size[1], ind)
     n_cnt = 300
     x_axis_min = x_min - x_diff / 2 - x_expand / 2
     x_axis_max = x_max + x_diff / 2 + x_expand / 2
@@ -64,7 +66,7 @@ def plot_graph(ind, fig, opts, sts, mns, title, per, x_expand, y_expand):
 
     for i in range(len(mns)):
         st = sts[i]
-        ax.plot(st[0], st[1], 'o', color=arrow_color[i], ms=5, mew=3, label=st)
+        ax.plot(st[0], st[1], 'o', color=arrow_color[i], ms=5, mew=3, label=labels[i])
         mn = mns[i]
         ax.plot(mn[0], mn[1], 'x', color=arrow_color[i], ms=8 + (len(mns) - i) * 3, mew=3)
 

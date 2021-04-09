@@ -23,7 +23,7 @@ class UndimOpt:
 
         self.f.reset()
         if self.preserve_logs:
-            self._log = [st + [self.f(*st)]]
+            self._log = [list(st) + [self.f(*st)]]
         else:
             self._log = []
         self.f.start_count()
