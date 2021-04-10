@@ -1,13 +1,23 @@
 from scipy.optimize import linprog
 import numpy as np
+from functools import cmp_to_key
+
+def lex(v1, v2):
+    res = v1[0] - v2[0]
+    for i in res:
+        if abs(i) < 1e-5:
+            return False if i > 0 else True
+    return False
 
 class SimplexAlgorithm:
     table = None
     lr = None
     lc = None
+    glob_row_id = 0
+    glob_col_id = 0
 
     def gen_matrix(self, var, cons):
-        self.table = np.zeros((cons+1, var+cons+2))
+        self.table = np.zeros((cons+1, var+cons+2), dtype=float)
         self.lr = len(self.table[:, 0])
         self.lc = len(self.table[0, :])
 
@@ -26,6 +36,7 @@ class SimplexAlgorithm:
 
     def neg_row_id(self):
         m = min(self.table[:-1, self.lc - 1])
+        n = None
         if m <= 0:
             n = np.where(self.table[:-1, self.lc - 1] == m)[0][0]
         else:
@@ -49,9 +60,10 @@ class SimplexAlgorithm:
             c = np.where(row == m)[0][0]
             col = self.table[:-1,c]
             #smallest positive ratio
+            
             for i, b in zip(col,self.table[:-1,-1]):
                 if i**2 > 0 and b / i > 0:
-                    total.append(b/i)
+                    total.append(b / i)
                 else:
                     total.append(0)
             element = max(total)
@@ -63,26 +75,18 @@ class SimplexAlgorithm:
 
             index = total.index(element)
             return (index, c)
-            
+
     # similar process, returns a specific array element to be pivoted on.
     def row_pivot(self):
         if self.iterate_row():
-            total = []
             n = self.neg_col_id()
-            for i,b in zip(self.table[:-1, n], self.table[:-1, -1]):
-                if i ** 2 > 0 and b / i > 0:
-                    total.append(b/i)
-                else:
-                    total.append(0)
-            element = max(total)
-            for t in total:
-                if t > 0 and t < element:
-                    element = t
-                else:
-                    continue
-
-            index = total.index(element)
-            return (index,n)
+            vecs = []
+            for r in range(0, self.lr - 1):
+                qis = self.table[r][n]
+                if qis > 0:
+                    vecs.append([np.array([self.table[r][j] / qis for j in range(self.lc)]), r])
+            vecs = sorted(vecs, key=cmp_to_key(lex))
+            return (vecs[0][1], n)
 
     def convert_min(self):
         self.table[-1,:-2] = [-1*i for i in self.table[-1,:-2]]
@@ -145,7 +149,6 @@ class SimplexAlgorithm:
             self.table = self.pivot(self.col_pivot())
         while self.iterate_row():
             self.table = self.pivot(self.row_pivot())
-
         var = self.lc - self.lr - 1
         i = 0
         val = {}
@@ -174,23 +177,68 @@ class SimplexAlgorithm:
         self.obj(f_obj)
         return self.minz()
 
-f_obj = [-1, -2]
 
+def simple_test(f_obj, lhs_ineq, rhs_ineq, lhs_eq, rhs_eq):    
+    opt = linprog(c=f_obj, A_ub=lhs_ineq, b_ub = rhs_ineq, A_eq = lhs_eq, b_eq = rhs_eq, method = 'revised simplex')
+    algo = SimplexAlgorithm()
+    res = algo.linprog(f_obj, lhs_ineq, rhs_ineq, lhs_eq, rhs_eq)
+    assert(abs(opt.fun - res['min']) < 1e-5)
+
+
+def simple_test_eq(f_obj, lhs_eq, rhs_eq):    
+    opt = linprog(c=f_obj, A_eq = lhs_eq, b_eq = rhs_eq, method = 'revised simplex')
+    algo = SimplexAlgorithm()
+    res = algo.linprog(f_obj, [], [], lhs_eq, rhs_eq)
+    assert(abs(opt.fun - res['min']) < 1e-5)
+
+#task 6:
+f_obj = [1, 1, -2, -3]
+lhs_eq = [[2, 1, 1, 0], [-1, 2, 0, 1]]
+rhs_eq = [1, 1]
+simple_test_eq(f_obj, lhs_eq, rhs_eq)
+#it is the minimum
+
+#testing
+#1
+f_obj = [-6, -1, -4, 5]
+lhs_eq = [[3, 1, -1, 1], [5, 1, 1, -1]]
+rhs_eq = [4, 4]
+simple_test_eq(f_obj, lhs_eq, rhs_eq)
+#2
+f = [-1, -2, -3, 1]
+l = [[1, -3, -1, -2], [1, -1, 1, 0]]
+r = [-4, 0]
+simple_test_eq(f, l, r)
+#3
+f_obj = [-1, -2]
 lhs_ineq = [[ 2,  1], 
             [-4,  5], 
             [ 1, -2]]
-
 rhs_ineq = [20, 10, 2]
-
 lhs_eq = [[-1, 5]]
 rhs_eq = [15]
-
-INF = float('inf')
-
-opt = linprog(c=f_obj, A_ub=lhs_ineq, b_ub = rhs_ineq, A_eq = lhs_eq, b_eq = rhs_eq, method = 'revised simplex')
-
-print(opt)
-
-algo = SimplexAlgorithm()
-
-print(algo.linprog(f_obj, lhs_ineq, rhs_ineq, lhs_eq, rhs_eq))
+simple_test(f_obj, lhs_ineq, rhs_ineq, lhs_eq, rhs_eq)
+#4
+f = [-1, -1, -1, 1, -1]
+leq = [[1, 1, 2, 0, 0], [0, -2, -2, 1, -1]]
+req = [4, -6]
+l_ineq = [[-1, 1, -6, -1, -1]]
+r_ineq = [0]
+simple_test(f, l_ineq, r_ineq, leq, req)
+#5
+f = [-1, 4, -3, 10]
+leq = [[1, 1, -1, -10], [1, 14, 10, -10]]
+req = [0, 11]
+l_ineq = [[-1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]]
+r_ineq = [0, 0, 0, 0]
+simple_test(f, l_ineq, r_ineq, leq, req)
+#6
+f = [-1, 5, 1, -1]
+ineq_l = [[1, 3, 3, 1], [2, 0, 3, -1]]
+ineq_r = [3, 4]
+simple_test(f, ineq_l, ineq_r, [[0, 0, 0, 0]], [0])
+#7
+f = [-1, -1, 1, -1, 2]
+eq_l = [[3, 1, 1, 1, -2], [6, 1, 2, 3, -4], [10, 1, 3, 6, -7]]
+eq_r =[10, 20, 30]
+simple_test_eq(f, eq_l, eq_r)
