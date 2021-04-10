@@ -5,6 +5,7 @@ import numpy as np
 from lab1.task1.golden_ratio import GoldenRatio
 from lab1.watcher import Watcher
 from lab2.newton import Newton
+from lab2.conjgrad import ConjGrad
 
 
 functions = [lambda x, y: 100 * (y - x) ** 2 + (1 - x) ** 2,
@@ -42,17 +43,20 @@ initial_points = [
     np.array([0.1, -0.5]),
 ]
 
-for j in range(len(functions)):
-    f = Watcher(functions[j], gradients[j], hesse[j])
-    opt = Newton(f, 1e-5, GoldenRatio)
+def simple_test(alg):
+    for j in range(len(functions)):
+        f = Watcher(functions[j], gradients[j], hesse[j])
+        print(j)
+        for ip in initial_points:
+            opt = alg(f, 1e-5, GoldenRatio)
+            try:
+                mn = opt.opt(ip)
+                print(mn, opt.get_iterations_cnt())
+            except RuntimeError as e:
+                if hasattr(e, 'message'):
+                    print(e.message)
+                else:
+                    print(e)
 
-    print(j)
-    for ip in initial_points:
-        try:
-            mn = opt.opt(ip)
-            print(mn, opt.get_iterations_cnt())
-        except RuntimeError as e:
-            if hasattr(e, 'message'):
-                print(e.message)
-            else:
-                print(e)
+simple_test(Newton)
+simple_test(ConjGrad)
