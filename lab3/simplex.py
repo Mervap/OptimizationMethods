@@ -191,54 +191,56 @@ def simple_test_eq(f_obj, lhs_eq, rhs_eq):
     res = algo.linprog(f_obj, [], [], lhs_eq, rhs_eq)
     assert(abs(opt.fun - res['min']) < 1e-5)
 
-#task 6:
-f_obj = [1, 1, -2, -3]
-lhs_eq = [[2, 1, 1, 0], [-1, 2, 0, 1]]
-rhs_eq = [1, 1]
-simple_test_eq(f_obj, lhs_eq, rhs_eq)
-#it is the minimum
+def runAllTests():
+    #task 8:
+    f_obj = [1, 1, -2, -3]
+    lhs_eq = [[2, 1, 1, 0], [-1, 2, 0, 1]]
+    rhs_eq = [1, 1]
+    simple_test_eq(f_obj, lhs_eq, rhs_eq)
+    #it is the minimum
 
-#testing
-#1
-f_obj = [-6, -1, -4, 5]
-lhs_eq = [[3, 1, -1, 1], [5, 1, 1, -1]]
-rhs_eq = [4, 4]
-simple_test_eq(f_obj, lhs_eq, rhs_eq)
-#2
-f = [-1, -2, -3, 1]
-l = [[1, -3, -1, -2], [1, -1, 1, 0]]
-r = [-4, 0]
-simple_test_eq(f, l, r)
-#3
-f_obj = [-1, -2]
-lhs_ineq = [[ 2,  1], 
-            [-4,  5], 
-            [ 1, -2]]
-rhs_ineq = [20, 10, 2]
-lhs_eq = [[-1, 5]]
-rhs_eq = [15]
-simple_test(f_obj, lhs_ineq, rhs_ineq, lhs_eq, rhs_eq)
-#4
-f = [-1, -1, -1, 1, -1]
-leq = [[1, 1, 2, 0, 0], [0, -2, -2, 1, -1]]
-req = [4, -6]
-l_ineq = [[-1, 1, -6, -1, -1]]
-r_ineq = [0]
-simple_test(f, l_ineq, r_ineq, leq, req)
-#5
-f = [-1, 4, -3, 10]
-leq = [[1, 1, -1, -10], [1, 14, 10, -10]]
-req = [0, 11]
-l_ineq = [[-1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]]
-r_ineq = [0, 0, 0, 0]
-simple_test(f, l_ineq, r_ineq, leq, req)
-#6
-f = [-1, 5, 1, -1]
-ineq_l = [[1, 3, 3, 1], [2, 0, 3, -1]]
-ineq_r = [3, 4]
-simple_test(f, ineq_l, ineq_r, [[0, 0, 0, 0]], [0])
-#7
-f = [-1, -1, 1, -1, 2]
-eq_l = [[3, 1, 1, 1, -2], [6, 1, 2, 3, -4], [10, 1, 3, 6, -7]]
-eq_r =[10, 20, 30]
-simple_test_eq(f, eq_l, eq_r)
+    #testing
+    #1
+    f_obj = [-6, -1, -4, 5]
+    lhs_eq = [[3, 1, -1, 1], [5, 1, 1, -1]]
+    rhs_eq = [4, 4]
+    simple_test_eq(f_obj, lhs_eq, rhs_eq)
+    #2
+    f = [-1, -2, -3, 1]
+    l = [[1, -3, -1, -2], [1, -1, 1, 0]]
+    r = [-4, 0]
+    simple_test_eq(f, l, r)
+    #3
+    f_obj = [-1, -2]
+    lhs_ineq = [[ 2,  1], 
+                [-4,  5], 
+                [ 1, -2]]
+    rhs_ineq = [20, 10, 2]
+    lhs_eq = [[-1, 5]]
+    rhs_eq = [15]
+    simple_test(f_obj, lhs_ineq, rhs_ineq, lhs_eq, rhs_eq)
+    #4
+    f = [-1, -1, -1, 1, -1]
+    leq = [[1, 1, 2, 0, 0], [0, -2, -2, 1, -1]]
+    req = [4, -6]
+    l_ineq = [[-1, 1, -6, -1, -1]]
+    r_ineq = [0]
+    simple_test(f, l_ineq, r_ineq, leq, req)
+    #5
+    f = [-1, 4, -3, 10]
+    leq = [[1, 1, -1, -10], [1, 14, 10, -10]]
+    req = [0, 11]
+    l_ineq = [[-1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]]
+    r_ineq = [0, 0, 0, 0]
+    simple_test(f, l_ineq, r_ineq, leq, req)
+    #6
+    f = [-1, 5, 1, -1]
+    ineq_l = [[1, 3, 3, 1], [2, 0, 3, -1]]
+    ineq_r = [3, 4]
+    simple_test(f, ineq_l, ineq_r, [[0, 0, 0, 0]], [0])
+    #7
+    f = [-1, -1, 1, -1, 2]
+    eq_l = [[3, 1, 1, 1, -2], [6, 1, 2, 3, -4], [10, 1, 3, 6, -7]]
+    eq_r =[10, 20, 30]
+    simple_test_eq(f, eq_l, eq_r)
+    print("All tests passed.")
